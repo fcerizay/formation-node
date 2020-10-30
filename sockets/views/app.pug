@@ -1,0 +1,37 @@
+html
+    include includes/head.pug
+    body
+        div(class="container")
+            div(class="row")
+                div(class="col-md-6 offset-md-3")
+                    h1(class="text-center") Formation NodeJs
+                    hr
+                    h4 Chat
+                    ul(class="list-group" id="list")
+                        each message in messages
+                            li=`${message.user} : ${message.message}`
+                    hr
+
+                    div(class="input-group mb-3")
+                        input(type="text" id="message" class="form-control")
+                        button(type="button" id="send" class="btn btn-primary") Send
+
+    script(src="/socket.io/socket.io.js")
+    script(src="https://code.jquery.com/jquery-3.5.1.min.js")
+
+    script.
+        const socket = io();
+        var pseudo = prompt('Pseudo');
+        socket.emit('username', pseudo);
+
+        $('#send').click(function(){
+            socket.emit('message', $('#message').val());
+        });
+
+        socket.on('update', async function (messages){
+            var li='';
+            messages.forEach(message => {
+                li+=`<li>${message.user} : ${message.message}</li>`;
+            }); 
+            $('#list').html(li);
+        })
